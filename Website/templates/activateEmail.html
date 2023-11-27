@@ -6,5 +6,9 @@ http://{{ domain }}{% url 'activate' uidb64=uid token=token %}
 
 Your QR Code has been generated and is available in your TransitSync account wallet. Please keep in mind that your QR Code contains sensitive information, and it should not be shared with anyone.
 
-QR Code: <img src="{{ user.QR.url }}" alt="QR Code">
+{% if user.QR %}
+    QR Code: <img src="{{ user.QR.url }}" alt="QR Code">
+{% else %}
+    <p></p>
+{% endif %}
 Serial Number: {{ user.userSN }}

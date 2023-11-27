@@ -19,13 +19,12 @@ class ConductorRegistrationForm(UserCreationForm):
     emergencyContact = forms.CharField(validators=[phone_regex], max_length=11, required=False, widget=forms.TextInput(attrs={'placeholder': '09*********'}))
     email = forms.EmailField(help_text='A valid email address, please.', required=True)
     birthDate = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    validID = forms.ImageField(required=False)  # Add this field for "valid ID" image upload
 
     class Meta:
         model = get_user_model()
         fields = ['first_name', 'middle_name', 'last_name', 'username', 'email', 'password1', 'password2',
                         'gender', 'age', 'birthDate', 'contactNumber', 'emergencyContact', 'contactPerson',
-                         'validID', 'DPA','TransportationType' ]
+                          'DPA','TransportationType' ]
         
         
     def save(self, commit=True):
@@ -46,13 +45,11 @@ class CashierRegistrationForm(UserCreationForm):
     emergencyContact = forms.CharField(validators=[phone_regex], max_length=11, required=False, widget=forms.TextInput(attrs={'placeholder': '09*********'}))
     email = forms.EmailField(help_text='A valid email address, please.', required=True)
     birthDate = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    validID = forms.ImageField(required=False)  # Add this field for "valid ID" image upload
-
     class Meta:
         model = get_user_model()
         fields = ['first_name', 'middle_name', 'last_name', 'username', 'email', 'password1', 'password2',
                         'gender', 'age', 'birthDate', 'contactNumber', 'emergencyContact', 'contactPerson',
-                         'validID', 'DPA' ]
+                         'DPA' ]
         
         
     def save(self, commit=True):

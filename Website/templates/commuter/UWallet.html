@@ -278,11 +278,11 @@ body {
                                             </button>
                                         </div>
                                         <div class="modal-body">
-                                            {% if user.validID %}
+                                            {% if user.validID and user.validID.url %}
                                             <img src="{{ user.validID.url }}" alt="Valid ID" class="img-fluid">
-                                            {% else %}
-                                            N/A
-                                            {% endif %}
+                                        {% else %}
+                                            <img src="{% get_media_prefix %}valid_ids/id_default_employee.jpg" alt="Valid ID" class="img-fluid">
+                                        {% endif %}
                                         </div>
                                     </div>
                                 </div>

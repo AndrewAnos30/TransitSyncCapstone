@@ -21,8 +21,6 @@ from .tokens import account_activation_token
 from .forms import UserUpdateForm
 from .forms import PasswordResetForm
 from django.db.models.query_utils import Q
-from django.http import HttpResponse  # Import HttpResponse for testing purposes
-
 
 
 
@@ -73,6 +71,7 @@ def activate(request, uidb64, token):
 # Create your views here.
 @user_not_authenticated
 def registerCommuter(request):
+
     placeholders = {
         'contactNumber_placeholder': '09*********',
         'emergencyContact_placeholder': '09*********',
@@ -81,15 +80,19 @@ def registerCommuter(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save(commit=False)
+            user = form.save(commit=False)  # Create the user object without saving it
             user.email = form.cleaned_data['email']
-            user.is_active = False
+            user.is_active=False
+            
 
+
+            # Generate a unique userSN
             userSN = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+
+
+            # Set UserGroup to "Commuter"
             user.UserGroup = "user"
             user.userSN = userSN
-
-            # Generate QR code
             qr_data = f"TransitSynch:{userSN}"
             qr = qrcode.QRCode(
                 version=1,
@@ -102,12 +105,13 @@ def registerCommuter(request):
             img = qr.make_image(fill_color="black", back_color="white")
             buffer = BytesIO()
             img.save(buffer, format="PNG")
+            user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=False)
 
-            # Use get method to avoid MultiValueDictKeyError
-            user.qr = request.FILES.get('QR')
+
             user.save()
             activateEmail(request, user, form.cleaned_data.get('email'))
             return redirect('login')
+
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
@@ -120,6 +124,8 @@ def registerCommuter(request):
         template_name="register.html",
         context={"form": form, "placeholders": placeholders}
     )
+
+
 @login_required
 def custom_logout(request):
     logout(request)
