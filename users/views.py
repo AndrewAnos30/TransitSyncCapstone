@@ -46,6 +46,7 @@ def activateEmail(request, user, to_email):
     else:
         messages.error(request, f'Problem sending confirmation email to {to_email}, check if you typed it correctly.')
         
+
 def activate(request, uidb64, token):
     User = get_user_model()
     try:
@@ -63,7 +64,7 @@ def activate(request, uidb64, token):
     else:
         messages.error(request, 'Activation link is invalid!')
     
-    return redirect('')
+    return redirect('login')
 
 
 

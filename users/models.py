@@ -38,7 +38,7 @@ class CustomUser(AbstractUser):
     emergencyContact= models.CharField(max_length=11,null=True, blank=True)
     contactPerson= models.CharField(max_length=100, null=True, blank=True)
     userSN= models.CharField(max_length=100, null=True, blank=True)
-    balance= models.FloatField(null=True, blank=True)
+    balance= models.FloatField(null=True, blank=True, default=0)
     DPA= models.BooleanField(default=False)
     graduation = models.DateField(null=True, blank=True)
     validID = models.ImageField(upload_to="valid_ids/", null=True, blank=True)
