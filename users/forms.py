@@ -19,7 +19,7 @@ class UserRegistrationForm(UserCreationForm):
     emergencyContact = forms.CharField(validators=[phone_regex], max_length=11, required=False, widget=forms.TextInput(attrs={'placeholder': '09*********'}))
     email = forms.EmailField(help_text='A valid email address, please.', required=True)
     birthDate = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
-    validID = forms.ImageField(required=False)  # Add this field for "valid ID" image upload
+    validID = forms.ImageField(required=False) 
 
 
     graduation = forms.DateField(
