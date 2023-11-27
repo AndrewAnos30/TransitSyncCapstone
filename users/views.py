@@ -102,7 +102,9 @@ def registerCommuter(request):
             img = qr.make_image(fill_color="black", back_color="white")
             buffer = BytesIO()
             img.save(buffer, format="PNG")
-            user.qr = request.FILES['QR']
+
+            # Use get method to avoid MultiValueDictKeyError
+            user.qr = request.FILES.get('QR')
             user.save()
             activateEmail(request, user, form.cleaned_data.get('email'))
             return redirect('login')
