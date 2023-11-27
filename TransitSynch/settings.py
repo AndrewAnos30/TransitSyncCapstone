@@ -86,14 +86,6 @@ WSGI_APPLICATION = 'TransitSynch.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.sqlite3',
-       'NAME': BASE_DIR / 'db.sqlite3',
-   }
-}
-
-
 import dj_database_url 
 DATABASES = {
    'default':  dj_database_url.parse('postgres://transitsync_user:LW1f9iVJ6kw46SWefOFm75o5PcE1wfd9@dpg-clhfill8td7s73bo8cfg-a.singapore-postgres.render.com/transitsync')
@@ -165,7 +157,6 @@ RECAPTCHA_PRIVATE_KEY = '6LfltRUoAAAAAPbXtDRp2_uE1v9QuGR9At3qGDWS'
 RECAPTCHA_PROXY = {'http': 'http://127.0.0.1:8000', 'https': 'https://127.0.0.1:8000'}
 
 RECAPTCHA_DOMAIN = 'www.recaptcha.net'
-MEDIA_URL = '/media/'
 
 
     
