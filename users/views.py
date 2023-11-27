@@ -102,19 +102,7 @@ def registerCommuter(request):
             img = qr.make_image(fill_color="black", back_color="white")
             buffer = BytesIO()
             img.save(buffer, format="PNG")
-
-            # Debug statements
-            print(f"Generated QR code data: {qr_data}")
-            print(f"Image buffer content: {buffer.getvalue()}")
-
-            # Save QR code image as a ContentFile to the user model
-            try:
-                user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=True)
-                print(f"QR Image URL: {user.QR.url}")
-            except Exception as e:
-                print(f"Error during QR code image saving: {e}")
-                return HttpResponse("Error during QR code image saving. Check console for details.", status=500)
-
+            user.qr_image_field = request.FILES['QR']
             user.save()
             activateEmail(request, user, form.cleaned_data.get('email'))
             return redirect('login')
