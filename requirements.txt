@@ -65,5 +65,5 @@ typing_extensions==4.7.1
 tzdata==2023.3
 urllib3==2.0.4
 Werkzeug==2.2.3
-whitenoise==6.5.0
+whitenoise
 xmltodict==0.10.1

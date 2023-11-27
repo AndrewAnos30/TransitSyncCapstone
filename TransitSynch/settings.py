@@ -60,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'TransitSynch.urls'
@@ -119,8 +120,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
+STATIC_URL = 'https://transitsyncfinals.onrender.com/static/'
+MEDIA_URL = 'https://transitsyncfinals.onrender.com/media/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 
