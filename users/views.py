@@ -107,9 +107,8 @@ def registerCommuter(request):
             buffer = BytesIO()
             img.save(buffer, format="PNG")
 
-            # Save QR code image as bytes to the user model
-            user.QR = buffer.getvalue()
-
+            # Save QR code image as a ContentFile to the user model
+            user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=True)
 
             user.save()
             activateEmail(request, user, form.cleaned_data.get('email'))
