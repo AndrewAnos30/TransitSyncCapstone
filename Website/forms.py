@@ -25,7 +25,7 @@ class ConductorRegistrationForm(UserCreationForm):
         model = get_user_model()
         fields = ['first_name', 'middle_name', 'last_name', 'username', 'email', 'password1', 'password2',
                         'gender', 'age', 'birthDate', 'contactNumber', 'emergencyContact', 'contactPerson',
-                         'validID', 'DPA','TransportationType', 'QR' ]
+                         'validID', 'DPA','TransportationType' ]
         
         
     def save(self, commit=True):
@@ -52,7 +52,7 @@ class CashierRegistrationForm(UserCreationForm):
         model = get_user_model()
         fields = ['first_name', 'middle_name', 'last_name', 'username', 'email', 'password1', 'password2',
                         'gender', 'age', 'birthDate', 'contactNumber', 'emergencyContact', 'contactPerson',
-                         'validID', 'DPA', 'QR' ]
+                         'validID', 'DPA' ]
         
         
     def save(self, commit=True):

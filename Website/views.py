@@ -491,21 +491,6 @@ def create_conductor(request):
             user.DPA = True
             user.verified = True
 
-            qr_data = f"TransitSynch:{userSN}"
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
-            )
-            qr.add_data(qr_data)
-            qr.make(fit=True)
-            img = qr.make_image(fill_color="black", back_color="white")
-            buffer = BytesIO()
-            img.save(buffer, format="PNG")
-            user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=False)
-
-
             user.save()
             activateEmailw(request, user, form.cleaned_data.get('email'))
             return redirect('account_management')
@@ -549,20 +534,6 @@ def create_cashier(request):
             user.UserGroup = "cashier"
             user.DPA = True
             user.verified = True
-
-            qr_data = f"TransitSynch:{userSN}"
-            qr = qrcode.QRCode(
-                version=1,
-                error_correction=qrcode.constants.ERROR_CORRECT_L,
-                box_size=10,
-                border=4,
-            )
-            qr.add_data(qr_data)
-            qr.make(fit=True)
-            img = qr.make_image(fill_color="black", back_color="white")
-            buffer = BytesIO()
-            img.save(buffer, format="PNG")
-            user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=False)
 
 
             user.save()
