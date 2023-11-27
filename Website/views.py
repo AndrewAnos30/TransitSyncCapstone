@@ -39,7 +39,7 @@ import math
 # Create your views here.
 def activateEmail(request, user, to_email):
     mail_subject = 'Activate your user account.'
-    message = render_to_string('activation.html', {
+    message = render_to_string('activateEmail.html', {
         'user': user.username,
         'domain': get_current_site(request).domain,
         'uid': urlsafe_base64_encode(force_bytes(user.pk)),
@@ -145,139 +145,134 @@ def ConTransaction(request):
                     # Handle the case when no matching user is found (e.g., set a default status)
                     record.commuterStatus = "Unknown"
                 record.save()
+    for record in records:
+        if record.km is not None and record.TranspoType == "PUJ":
+            try:
+                current_price = CurrentPrice.objects.get(Num=1)
+                initial_price = CurrentPrice.objects.filter(Num=1).first()
+                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
 
-    if record.km is not None and record.TranspoType == "PUJ":
-        try:
-            current_price = CurrentPrice.objects.get(Num=1)
-            initial_price = CurrentPrice.objects.filter(Num=1).first()
-            succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
+                initial_distance = 4.10
+                succeeding_distance = max(0, record.km - initial_distance)
+                rounded_succeeding_distance = math.ceil(succeeding_distance)
 
-            initial_distance = 4.10
-            succeeding_distance = max(0, record.km - initial_distance)
-            rounded_succeeding_distance = math.ceil(succeeding_distance)
+                # Set the multiplier based on the commuterStatus
+                multiplier = 1.0 if record.commuterStatus == "Ordinary" else 0.80
 
-            # Set the multiplier based on the commuterStatus
-            multiplier = 1.0 if record.commuterStatus == "Ordinary" else 0.80
+                record.price = (
+                    current_price.CurrentFarePUJ * multiplier if record.km < 4.10
+                    else (initial_price.CurrentFarePUJ + (succeeding_price.CurrentSucceedingPUJ * rounded_succeeding_distance)) * multiplier
+                )
 
-            record.price = (
-                current_price.CurrentFarePUJ * multiplier if record.km < 4.10
-                else (initial_price.CurrentFarePUJ + (succeeding_price.CurrentSucceedingPUJ * rounded_succeeding_distance)) * multiplier
-            )
+                user = CustomUser.objects.get(userSN=record.extracted_data)
+                if user.balance is not None and user.balance >= record.price:
+                    user.balance -= record.price
+                    user.save()
+                else:
+                    # Handle insufficient balance or other cases
+                    pass
 
-            user = CustomUser.objects.get(userSN=record.extracted_data)
-            if user.balance is not None and user.balance >= record.price:
-                user.balance -= record.price
-                user.save()
-            else:
-                # Handle insufficient balance or other cases
-                pass
-
-        except (CurrentPrice.DoesNotExist, CustomUser.DoesNotExist):
-            # Handle the case when no matching CurrentPrice or user is found
-            record.price = 0  # Set a default price
-
-        record.save()
-
-    elif record.km is not None and record.TranspoType == "Modernized PUJ":
-        try:
-            current_price = CurrentPrice.objects.get(Num=1)
-            initial_price = CurrentPrice.objects.filter(Num=1).first()
-            succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
-
-            initial_distance = 4.10
-            succeeding_distance = max(0, record.km - initial_distance)
-            rounded_succeeding_distance = math.ceil(succeeding_distance)
-
-            # Set the multiplier based on the commuterStatus
-            multiplier = 1.20 if record.commuterStatus == "Ordinary" else 0.80
-
-            record.price = (
-                current_price.CurrentFarePUJ * multiplier if record.km < 4.10
-                else (initial_price.CurrentFarePUJ * multiplier) + (succeeding_price.CurrentSucceedingPUJ * rounded_succeeding_distance)
-            )
+            except (CurrentPrice.DoesNotExist, CustomUser.DoesNotExist):
+                # Handle the case when no matching CurrentPrice or user is found
+                record.price = 0  # Set a default price
 
             record.save()
 
-        except CurrentPrice.DoesNotExist:
-            # Handle the case when no matching CurrentPrice is found
-            record.price = 0  # Set a default price
-        record.save()
-# Additional logic for other cases can be added as needed
+        elif record.km is not None and record.TranspoType == "Modernized PUJ":
+            try:
+                current_price = CurrentPrice.objects.get(Num=1)
+                initial_price = CurrentPrice.objects.filter(Num=1).first()
+                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
 
-    elif record.km is not None and record.TranspoType == "AirConditioned PUJ":
-        try:
-            current_price = CurrentPrice.objects.get(Num=1)
-            initial_price = CurrentPrice.objects.filter(Num=1).first()
-            succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
+                initial_distance = 4.10
+                succeeding_distance = max(0, record.km - initial_distance)
+                rounded_succeeding_distance = math.ceil(succeeding_distance)
 
-            initial_distance = 4.10
-            succeeding_distance = max(0, record.km - initial_distance)
-            rounded_succeeding_distance = math.ceil(succeeding_distance)
+                # Set the multiplier based on the commuterStatus
+                multiplier = 1.20 if record.commuterStatus == "Ordinary" else 0.80
 
-            # Set the multiplier based on the commuterStatus
-            multiplier = 1.20 if record.commuterStatus == "Ordinary" else 0.80
+                record.price = (
+                    current_price.CurrentFarePUJ * multiplier if record.km < 4.10
+                    else (initial_price.CurrentFarePUJ * multiplier) + (succeeding_price.CurrentSucceedingPUJ * rounded_succeeding_distance)
+                )
 
-            record.price = (
-                current_price.CurrentFarePUJ * multiplier if record.km < 4.10
-                else (initial_price.CurrentFarePUJ * multiplier) + ((succeeding_price.CurrentSucceedingPUJ * multiplier) * rounded_succeeding_distance)
-            )
+                record.save()
 
+            except CurrentPrice.DoesNotExist:
+                # Handle the case when no matching CurrentPrice is found
+                record.price = 0  # Set a default price
             record.save()
-
-        except CurrentPrice.DoesNotExist:
-            # Handle the case when no matching CurrentPrice is found
-            record.price = 0  # Set a default price
-        record.save()
     # Additional logic for other cases can be added as needed
 
+        elif record.km is not None and record.TranspoType == "AirConditioned PUJ":
+            try:
+                current_price = CurrentPrice.objects.get(Num=1)
+                initial_price = CurrentPrice.objects.filter(Num=1).first()
+                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
 
-    elif record.km is not None and record.TranspoType == "Regular Bus":
-        try:
-            current_price = CurrentPrice.objects.get(Num=1)
-            initial_price = CurrentPrice.objects.filter(Num=1).first()
-            succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
+                initial_distance = 4.10
+                succeeding_distance = max(0, record.km - initial_distance)
+                rounded_succeeding_distance = math.ceil(succeeding_distance)
 
-            initial_distance = 4.10
-            succeeding_distance = max(0, record.km - initial_distance)
-            rounded_succeeding_distance = math.ceil(succeeding_distance)
+                # Set the multiplier based on the commuterStatus
+                multiplier = 1.20 if record.commuterStatus == "Ordinary" else 0.80
 
-            record.price = (
-                current_price.CurrentFareBus if record.km < 5.10
-                else initial_price.CurrentFarePUJ + (succeeding_price.CurrentSucceedingBus * rounded_succeeding_distance)
-            )
+                record.price = (
+                    current_price.CurrentFarePUJ * multiplier if record.km < 4.10
+                    else (initial_price.CurrentFarePUJ * multiplier) + ((succeeding_price.CurrentSucceedingPUJ * multiplier) * rounded_succeeding_distance)
+                )
 
+                record.save()
+
+            except CurrentPrice.DoesNotExist:
+                # Handle the case when no matching CurrentPrice is found
+                record.price = 0  # Set a default price
             record.save()
 
-        except CurrentPrice.DoesNotExist:
-            # Handle the case when no matching CurrentPrice is found
-            record.price = 0  # Set a default price
-        record.save()
+        elif record.km is not None and record.TranspoType == "Regular Bus":
+            try:
+                current_price = CurrentPrice.objects.get(Num=1)
+                initial_price = CurrentPrice.objects.filter(Num=1).first()
+                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
 
-# Additional logic for other cases can be added as needed
+                initial_distance = 4.10
+                succeeding_distance = max(0, record.km - initial_distance)
+                rounded_succeeding_distance = math.ceil(succeeding_distance)
 
+                record.price = (
+                    current_price.CurrentFareBus if record.km < 5.10
+                    else initial_price.CurrentFarePUJ + (succeeding_price.CurrentSucceedingBus * rounded_succeeding_distance)
+                )
 
-    elif record.km is not None and record.TranspoType == "Modernized Bus":
-        try:
-            current_price = CurrentPrice.objects.get(Num=1)
-            initial_price = CurrentPrice.objects.filter(Num=1).first()
-            succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
+                record.save()
 
-            initial_distance = 4.10
-            succeeding_distance = max(0, record.km - initial_distance)
-            rounded_succeeding_distance = math.ceil(succeeding_distance)
-
-            record.price = (
-                current_price.CurrentFareBus if record.km < 4.10
-                else initial_price.CurrentFarePUJ + ((succeeding_price.CurrentFareBus * 1.20) * rounded_succeeding_distance)
-            )
-
+            except CurrentPrice.DoesNotExist:
+                # Handle the case when no matching CurrentPrice is found
+                record.price = 0  # Set a default price
             record.save()
 
-        except CurrentPrice.DoesNotExist:
-            # Handle the case when no matching CurrentPrice is found
-            record.price = 0  # Set a default price
-        record.save()
-# Additional logic for other cases can be added as needed
+
+        elif record.km is not None and record.TranspoType == "Modernized Bus":
+            try:
+                current_price = CurrentPrice.objects.get(Num=1)
+                initial_price = CurrentPrice.objects.filter(Num=1).first()
+                succeeding_price = CurrentPrice.objects.filter(Num=1).order_by('Num').first()
+
+                initial_distance = 4.10
+                succeeding_distance = max(0, record.km - initial_distance)
+                rounded_succeeding_distance = math.ceil(succeeding_distance)
+
+                record.price = (
+                    current_price.CurrentFareBus if record.km < 4.10
+                    else initial_price.CurrentFarePUJ + ((succeeding_price.CurrentFareBus * 1.20) * rounded_succeeding_distance)
+                )
+
+                record.save()
+
+            except CurrentPrice.DoesNotExist:
+                # Handle the case when no matching CurrentPrice is found
+                record.price = 0  # Set a default price
+            record.save()
 
     unprocessed_records = TransportationRecord.objects.filter(processed=False)
 
@@ -537,11 +532,12 @@ def create_cashier(request):
             user = form.save(commit=False)  # Create the user object without saving it
             user.email = form.cleaned_data['email']
             user.is_active=False
-
+            
+            user.userSN = userSN
             qr_data = f"TransitSynch:{userSN}"
             # Generate a unique userSN
             userSN = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(20))
-            user.userSN = userSN
+            
 
             # Set UserGroup to "Commuter"
             user.UserGroup = "cashier"
