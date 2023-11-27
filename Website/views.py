@@ -37,7 +37,7 @@ import math
 
 
 # Create your views here.
-def activateEmail(request, user, to_email):
+def activateEmailw(request, user, to_email):
     mail_subject = 'Activate your user account.'
     message = render_to_string('activateEmail.html', {
         'user': user,
@@ -46,12 +46,19 @@ def activateEmail(request, user, to_email):
         'token': account_activation_token.make_token(user),
         'protocol': 'https' if request.is_secure() else 'http'
     })
+
+    # Create an EmailMessage instance
     email = EmailMessage(mail_subject, message, to=[to_email])
+
+    # Attach the QR code image to the email
+    qr_image_path = user.QR.path  # Assuming 'QR' is an ImageField in your model
+    email.attach_file(qr_image_path)
+
     if email.send():
-        messages.success(request, f'Dear <b>{user}</b>, please go to you email <b>{to_email}</b> inbox and click on \
-            received activation link to confirm and complete the registration. <b>Note:</b> Check your spam folder.')
+        messages.success(request, f'Dear <b>{user.username}</b>, please go to your email <b>{to_email}</b> inbox and click on the received activation link to confirm and complete the registration. <b>Note:</b> Check your spam folder.')
     else:
         messages.error(request, f'Problem sending confirmation email to {to_email}, check if you typed it correctly.')
+        
 
 
 def conductorScanner(request):
@@ -445,7 +452,7 @@ def account_management(request):
 
 @login_required
 def validation(request):
-    commuter_users = CustomUser.objects.filter(UserGroup='user')
+    commuter_users = CustomUser.objects.all
 
     return render(request,'admin/account/validate.html', {'commuter_users': commuter_users} )
 
@@ -473,19 +480,18 @@ def create_conductor(request):
             user.email = form.cleaned_data['email']
             user.is_active=False
             
+
+    
             # Generate a unique userSN
             userSN = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(20))
             user.userSN = userSN
 
-            # Combine "TransitSynch: " with userSN
-            qr_data = f"TransitSynch:{userSN}"
             # Set UserGroup to "Commuter"
             user.UserGroup = "conductor"
-
             user.DPA = True
             user.verified = True
 
-                # Generate a QR code using userSN and save it to 'QR' field
+            qr_data = f"TransitSynch:{userSN}"
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -499,11 +505,11 @@ def create_conductor(request):
             img.save(buffer, format="PNG")
             user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=False)
 
-            
 
             user.save()
-            activateEmail(request, user, form.cleaned_data.get('email'))
+            activateEmailw(request, user, form.cleaned_data.get('email'))
             return redirect('account_management')
+
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)
@@ -533,18 +539,18 @@ def create_cashier(request):
             user.email = form.cleaned_data['email']
             user.is_active=False
             
-            user.userSN = userSN
-            qr_data = f"TransitSynch:{userSN}"
-            # Generate a unique userSN
-            userSN = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(20))
-            
 
-            # Set UserGroup to "Commuter"
+    
+        
+            userSN = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(20))
+            user.userSN = userSN
+
+        
             user.UserGroup = "cashier"
             user.DPA = True
             user.verified = True
 
-                # Generate a QR code using userSN and save it to 'QR' field
+            qr_data = f"TransitSynch:{userSN}"
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_L,
@@ -559,10 +565,10 @@ def create_cashier(request):
             user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=False)
 
 
-
             user.save()
-            activateEmail(request, user, form.cleaned_data.get('email'))
+            activateEmailw(request, user, form.cleaned_data.get('email'))
             return redirect('account_management')
+
         else:
             for error in list(form.errors.values()):
                 messages.error(request, error)

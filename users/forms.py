@@ -32,7 +32,7 @@ class UserRegistrationForm(UserCreationForm):
         model = get_user_model()
         fields = ['first_name', 'middle_name', 'last_name', 'username', 'email', 'password1', 'password2',
                         'gender', 'age', 'birthDate', 'contactNumber', 'emergencyContact', 'contactPerson',
-                        'status', 'graduation', 'validID', 'DPA']
+                        'status', 'graduation', 'validID', 'DPA','QR']
         
         
     def save(self, commit=True):

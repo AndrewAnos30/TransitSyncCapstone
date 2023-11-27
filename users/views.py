@@ -93,6 +93,7 @@ def registerCommuter(request):
             # Set UserGroup to "Commuter"
             user.UserGroup = "user"
             user.userSN = userSN
+            # Generate QR code
             qr_data = f"TransitSynch:{userSN}"
             qr = qrcode.QRCode(
                 version=1,
@@ -105,7 +106,9 @@ def registerCommuter(request):
             img = qr.make_image(fill_color="black", back_color="white")
             buffer = BytesIO()
             img.save(buffer, format="PNG")
-            user.QR.save(f'qr_{userSN}.png', ContentFile(buffer.getvalue()), save=False)
+
+            # Save QR code image as bytes to the user model
+            user.QR = buffer.getvalue()
 
 
             user.save()
