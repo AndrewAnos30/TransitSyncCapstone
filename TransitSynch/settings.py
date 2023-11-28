@@ -49,8 +49,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-
 ]
 
 ROOT_URLCONF = 'TransitSynch.urls'
@@ -77,11 +75,9 @@ WSGI_APPLICATION = 'TransitSynch.wsgi.application'
 
 import dj_database_url 
 DATABASES = {
-   'default':  dj_database_url.config(
-    default='postgres://transitsync_user:LW1f9iVJ6kw46SWefOFm75o5PcE1wfd9@dpg-clhfill8td7s73bo8cfg-a/transitsync',
-    conn_max_age=600
-   )
+   'default':  dj_database_url.parse('postgres://transitsync_user:LW1f9iVJ6kw46SWefOFm75o5PcE1wfd9@dpg-clhfill8td7s73bo8cfg-a.singapore-postgres.render.com/transitsync')
 }
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
