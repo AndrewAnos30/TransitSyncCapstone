@@ -49,6 +49,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
 ]
 
 ROOT_URLCONF = 'TransitSynch.urls'
@@ -75,9 +77,11 @@ WSGI_APPLICATION = 'TransitSynch.wsgi.application'
 
 import dj_database_url 
 DATABASES = {
-   'default':  dj_database_url.parse('postgres://transitsync_user:LW1f9iVJ6kw46SWefOFm75o5PcE1wfd9@dpg-clhfill8td7s73bo8cfg-a.singapore-postgres.render.com/transitsync')
+   'default':  dj_database_url.config(
+    default='postgres://transitsync_user:LW1f9iVJ6kw46SWefOFm75o5PcE1wfd9@dpg-clhfill8td7s73bo8cfg-a/transitsync',
+    conn_max_age=600
+   )
 }
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -136,4 +140,11 @@ if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-    
+
+PASSWORD_RESET_TIMEOUT = 14400
+
+RECAPTCHA_PUBLIC_KEY = '6LfltRUoAAAAAGGj6MtE0IE03KeagpUkSrhCzTen'
+RECAPTCHA_PRIVATE_KEY = '6LfltRUoAAAAAPbXtDRp2_uE1v9QuGR9At3qGDWS'
+RECAPTCHA_PROXY = {'http': 'http://127.0.0.1:8000', 'https': 'https://127.0.0.1:8000'}
+
+RECAPTCHA_DOMAIN = 'www.recaptcha.net'

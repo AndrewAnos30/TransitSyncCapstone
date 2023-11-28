@@ -296,7 +296,9 @@ body {
         <div class="popup-content">
             <span class="close-btn" id="closeQRModal">&times;</span>
             <h2>QR Code</h2>
-            <img src="{{ user.QR.url }}" alt="QR Code" />
+            <div>
+            <img src="{% get_media_prefix %}qrs/default_qr.png" alt="QR Code" />
+        </div>
         </div>
     </div>
     
