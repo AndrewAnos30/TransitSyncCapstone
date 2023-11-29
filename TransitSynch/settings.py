@@ -132,7 +132,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static/')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 if not DEBUG:
-
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -144,3 +143,13 @@ RECAPTCHA_PRIVATE_KEY = '6LfltRUoAAAAAPbXtDRp2_uE1v9QuGR9At3qGDWS'
 RECAPTCHA_PROXY = {'http': 'http://127.0.0.1:8000', 'https': 'https://127.0.0.1:8000'}
 
 RECAPTCHA_DOMAIN = 'www.recaptcha.net'
+
+AWS_ACCESS_KEY_ID = 'AKIA6RF4UELZVEWXHTTB '
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'transitsync'
+AWS_S3_SIGNATURE_NAME = 's3v4',
+AWS_S3_REGION_NAME = 'ap-southeast-2'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL =  None
+AWS_S3_VERITY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'

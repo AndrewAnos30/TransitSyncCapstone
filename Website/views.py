@@ -51,7 +51,7 @@ def activateEmailw(request, user, to_email):
     email = EmailMessage(mail_subject, message, to=[to_email])
 
     # Attach the QR code image to the email
-    qr_image_path = user.QR.path  # Assuming 'QR' is an ImageField in your model
+    qr_image_path = user.QR.url  # Assuming 'QR' is an ImageField in your model
     email.attach_file(qr_image_path)
 
     if email.send():
@@ -523,18 +523,14 @@ def create_cashier(request):
             user = form.save(commit=False)  # Create the user object without saving it
             user.email = form.cleaned_data['email']
             user.is_active=False
-            
-
     
         
             userSN = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(20))
             user.userSN = userSN
 
-        
             user.UserGroup = "cashier"
             user.DPA = True
             user.verified = True
-
 
             user.save()
             activateEmailw(request, user, form.cleaned_data.get('email'))
